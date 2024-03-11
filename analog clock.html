@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analog Clock</title>
+    <style>
+        body {
+            background-color: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        canvas {
+            border: 2px solid black;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="clock" width="200" height="200"></canvas>
+</body>
+<script>
+    const canvas = document.getElementById('clock');
+    const ctx = canvas.getContext('2d');
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = canvas.width / 2 - 10;
+
+    function drawClock() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        drawFace();
+        drawNumbers();
+        drawTime();
+    }
+
+    function drawFace() {
+        ctx.beginPath();
+        ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+        ctx.fillStyle = 'white';
+        ctx.fill();
+        ctx.lineWidth = 2;
+        ctx.strokeStyle = 'black';
+        ctx.stroke();
+    }
+
+    function drawNumbers() {
+        ctx.font = '15px Arial';
+        ctx.fillStyle = 'black';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        for (let i = 1; i <= 12; i++) {
+            const angle = (i - 3) * (Math.PI * 2) / 12; // placing numbers in the right position
+            const x = centerX + Math.cos(angle) * (radius - 20);
+            const y = centerY + Math.sin(angle) * (radius - 20);
+            ctx.fillText(i.toString(), x, y);
+        }
+    }
+
+    function drawTime() {
+        const now = new Date();
+        const hours = now.getHours();
+        const minutes = now.getMinutes();
+        const seconds = now.getSeconds();
+
+        const hourAngle = (hours % 12 + minutes / 60) * (Math.PI * 2) / 12;
+        const minuteAngle = (minutes + seconds / 60) * (Math.PI * 2) / 60;
+        const secondAngle = seconds * (Math.PI * 2) / 60;
+
+        // Hour hand
+        drawHand(hourAngle, radius * 0.5, 6);
+
+        // Minute hand
+        drawHand(minuteAngle, radius * 0.8, 4);
+
+        // Second hand
+        drawHand(secondAngle, radius * 0.9, 2);
+    }
+
+    function drawHand(angle, length, width) {
+        ctx.beginPath();
+        ctx.lineWidth = width;
+        ctx.lineCap = 'round';
+        ctx.moveTo(centerX, centerY);
+        ctx.lineTo(centerX + Math.cos(angle) * length, centerY + Math.sin(angle) * length);
+        ctx.strokeStyle = 'black';
+        ctx.stroke();
+    }
+
+    // Set the clock to the current time initially
+    drawClock();
+
+    // Update the clock every second
+    setInterval(drawClock, 1000);
+</script>
+
+</html>
